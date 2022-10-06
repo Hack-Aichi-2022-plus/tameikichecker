@@ -1,95 +1,135 @@
-<div class="chart">
+<!DOCTYPE html>
 
-    <!-- Canvas 設置 -->
+<html>
 
-    <div style="position:relative;width:500px;height:200px;">
-        <canvas id="myChart"></canvas>
+<head>
+    <meta charset="utf-8">
+    <title>ため息チェッカー</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <h1>ため息チェッカー</h1>
+
+    <div class="container">
+        <div class="item">
+            <div class="chart">
+
+                <h1>あかさわわ</h1>
+
+                <!-- Canvas 設置 -->
+
+                <div style="position:relative;width:500px;height:300px;">
+                    <canvas id="myChart"></canvas>
+                </div>
+
+                <!-- char.js のインポート -->
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+                <script>
+
+                    const times = [...Array(30)].map((_, i) => i);
+
+                    var tmp;
+
+                    fetch(
+                        `https://script.google.com/macros/s/AKfycbwgKHlX9fzzMRhnSoIRbLgWkAJ85gwFYXJY-d6IAy0mxxTKg0YaLkbI2RndE6GGUTM9/exec`,
+                        {
+                            method: "GET"
+                        }
+                    )
+                        .then(function (response) {
+                            return response.json();
+                        })
+                        .then(function (data) {
+                            console.log(data);
+
+                            var test = new Array(31);
+                            var test2 = new Array(31);
+                            var test3 = new Array(31);
+                            var test4 = new Array(31);
+
+                            for (let i = 0; i < 29; i++) {
+                                console.log(data[i].temperature);
+                                test[i] = data[i].temperature;
+                                test2[i] = data[i].humidity;
+                                test3[i] = data[i].barometric;
+                                test4[i] = data[i].carbon;
+                            }
+
+                            console.log(data);
+
+                            tmp = {
+                                labels: times,
+                                datasets: [{
+                                    label: 'temperature',
+                                    backgroundColor: 'rgb(255, 99, 132)',
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    data: test,
+                                    lineTension: 0.3,
+                                    borderWidth: 3
+                                },
+                                {
+                                    label: 'humidity',
+                                    backgroundColor: 'rgb(99, 255, 132)',
+                                    borderColor: 'rgb(99, 255, 132)',
+                                    data: test2,
+                                    lineTension: 0.3,
+                                    borderWidth: 3
+                                },
+                                {
+                                    label: 'barometric',
+                                    backgroundColor: 'rgb(200, 99, 132)',
+                                    borderColor: 'rgb(200, 99, 132)',
+                                    data: test3,
+                                    lineTension: 0.3,
+                                    borderWidth: 3
+                                },
+                                {
+                                    label: 'carbon',
+                                    backgroundColor: 'rgb(99, 100, 132)',
+                                    borderColor: 'rgb(99, 100, 132)',
+                                    data: test4,
+                                    lineTension: 0.3,
+                                    borderWidth: 3
+                                }]
+                            };
+
+                            const config = {
+                                type: 'line',
+                                data: tmp,
+                                options: {}
+                            };
+
+                            const myChart = new Chart(
+                                document.getElementById('myChart'),
+                                config
+                            );
+                        })
+
+                </script>
+            </div>
+        </div>
+        <div class="item">item 2</div>
+        <div class="item">item 3</div>
+        <div class="item">item 4</div>
+        <div class="item">item 5</div>
+        <div class="item">item 6</div>
+        <div class="item">item 1</div>
+        <div class="item">item 2</div>
+        <div class="item">item 3</div>
+        <div class="item">item 4</div>
+        <div class="item">item 5</div>
+        <div class="item">item 6</div>
+        <div class="item">item 1</div>
+        <div class="item">item 2</div>
+        <div class="item">item 3</div>
+        <div class="item">item 4</div>
+        <div class="item">item 5</div>
+        <div class="item">item 6</div>
     </div>
+</body>
 
-    <!-- char.js のインポート -->
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <script>
-
-        const times = [...Array(30)].map((_, i) => i);
-
-        var tmp;
-
-        fetch(
-            `GAS_URL`,
-            {
-                method: "GET"
-            }
-        )
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (data) {
-                console.log(data);
-
-                var test = new Array(31);
-                var test2 = new Array(31);
-                var test3 = new Array(31);
-                var test4 = new Array(31);
-
-                for (let i = 0; i < 29; i++) {
-                    console.log(data[i].temperature);
-                    test[i] = data[i].temperature;
-                    test2[i] = data[i].humidity;
-                    test3[i] = data[i].barometric;
-                    test4[i] = data[i].carbon;
-                }
-
-                console.log(data);
-
-                tmp = {
-                    labels: times,
-                    datasets: [{
-                        label: 'temperature',
-                        backgroundColor: 'rgb(255, 99, 132)',
-                        borderColor: 'rgb(255, 99, 132)',
-                        data: test,
-                        lineTension: 0.3,
-                        borderWidth: 3
-                    },
-                    {
-                        label: 'humidity',
-                        backgroundColor: 'rgb(99, 255, 132)',
-                        borderColor: 'rgb(99, 255, 132)',
-                        data: test2,
-                        lineTension: 0.3,
-                        borderWidth: 3
-                    },
-                    {
-                        label: 'barometric',
-                        backgroundColor: 'rgb(200, 99, 132)',
-                        borderColor: 'rgb(200, 99, 132)',
-                        data: test3,
-                        lineTension: 0.3,
-                        borderWidth: 3
-                    },
-                    {
-                        label: 'carbon',
-                        backgroundColor: 'rgb(99, 100, 132)',
-                        borderColor: 'rgb(99, 100, 132)',
-                        data: test4,
-                        lineTension: 0.3,
-                        borderWidth: 3
-                    }]
-                };
-
-                const config = {
-                    type: 'line',
-                    data: tmp,
-                    options: {}
-                };
-
-                const myChart = new Chart(
-                    document.getElementById('myChart'),
-                    config
-                );
-            })
-
-    </script>
-</div>
+</html>
