@@ -1,0 +1,369 @@
+<div class="container">
+    <div class="item">
+        <div class="chart">
+
+            <h3>あかさわわ</h3>
+
+            <!-- Canvas 設置 -->
+
+            <div class="flex">
+                <div style="position:relative;width:400px;height:200px;">
+                    <canvas id="myChart"></canvas>
+                </div>
+
+                <div style="position:relative;width:400px;height:200px;">
+                    <canvas id="myChart1"></canvas>
+                </div>
+            </div>
+
+
+            <!-- char.js のインポート -->
+
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+            <script>
+
+                const times = [...Array(50)].map((_, i) => i);
+
+                var tmp;
+
+                fetch(
+                    `https://script.google.com/macros/s/AKfycbwgKHlX9fzzMRhnSoIRbLgWkAJ85gwFYXJY-d6IAy0mxxTKg0YaLkbI2RndE6GGUTM9/exec`,
+                    {
+                        method: "GET"
+                    }
+                )
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        console.log(data);
+
+                        var test = new Array(51);
+                        var test2 = new Array(51);
+                        var test3 = new Array(51);
+                        var test4 = new Array(51);
+
+                        for (let i = 0; i < 49; i++) {
+                            console.log(data[i].temperature_1);
+                            test[i] = data[i].temperature_1;
+                            test2[i] = data[i].humidity_1;
+                            test3[i] = data[i].barometric_1;
+                            test4[i] = data[i].carbon_1;
+                        }
+
+                        console.log(data);
+
+                        tmp = {
+                            labels: times,
+                            datasets: [{
+                                label: 'temperature',
+                                backgroundColor: 'rgb(255, 99, 132)',
+                                borderColor: 'rgb(255, 99, 132)',
+                                data: test,
+                                lineTension: 0.3,
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'humidity',
+                                backgroundColor: 'rgb(99, 255, 132)',
+                                borderColor: 'rgb(99, 255, 132)',
+                                data: test2,
+                                lineTension: 0.3,
+                                borderWidth: 1
+                            }]
+                        };
+
+                        const config = {
+                            type: 'line',
+                            data: tmp,
+                            options: {}
+                        };
+
+                        const myChart = new Chart(
+                            document.getElementById('myChart'),
+                            config
+                        );
+
+                        const myChart1 = new Chart(
+                            document.getElementById('myChart1'),
+                            config
+                        );
+
+                    })
+
+            </script>
+        </div>
+    </div>
+    <div class="item">
+        <!-- html -->
+
+        <!-- スクロール可能グラフ領域のラッパーブロック -->
+        <!-- Y軸イメージコピー用 canvas -->
+        <canvas id="yAxis" width="0"></canvas>
+
+        <div class="scrollableChartWrapper" style="width:400px">
+            <!-- スクロールされるcanvasを持つdiv -->
+            <div>
+                <!-- グラフ描画用キャンバス -->
+                <canvas id="chart" style="height:250px"></canvas>
+            </div>
+        </div>
+
+        <!-- javascript -->
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+        <script>
+            {
+                // Y軸コピー用canvasの取得
+                var cvsYAxis = document.getElementById("yAxis");
+                var ctxYAxis = cvsYAxis.getContext('2d');
+                // テスト用
+                var data = [];
+                var labels = [];
+                var colors = [];
+
+                for (i = 0; i < 15; i++) {
+                    [12, 19, 3, 5, 2, 3].forEach(x => { data.push(x); });
+                    ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'].forEach(x => { labels.push(x); });
+                    ['rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 206, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(153, 102, 255)',
+                        'rgb(255, 159, 64)'].forEach(x => { colors.push(x); });
+                }
+
+                // x軸の1データあたりの幅
+                var xAxisStepSize = 50;
+                // グラフ全体の幅を計算
+                var chartWidth = data.length * xAxisStepSize;
+                // グラフ描画用 canvas
+                var cvsChart = document.getElementById('chart');
+                var ctxChart = cvsChart.getContext('2d');
+                // グラフ描画用のcanvasのstyle.width（全データを描画するのに必要なサイズ）に上記の幅を設定
+                cvsChart.style.width = chartWidth + "px";
+
+                var copyYAxisCalled = false;
+
+                function copyYAxisImage(chart) {
+                    if (copyYAxisCalled) return;
+                    copyYAxisCalled = true;
+                    // グラフ描画後は、canvas.width(height):canvas.style.width(height) 比は、下記 scale の値になっている
+                    var scale = window.devicePixelRatio;
+
+                    // Y軸のスケール情報
+                    var yAxScale = chart.scales['y-axis-0'];
+
+                    // Y軸部分としてグラフからコピーすべき幅 (TODO: 良く分かっていない)
+                    var yAxisStyleWidth0 = yAxScale.width - 10;
+                    // canvas におけるコピー幅(yAxisStyleWidth0を直接使うと微妙にずれるので、整数値に切り上げる)
+                    var copyWidth = Math.ceil(yAxisStyleWidth0 * scale);
+                    // Y軸canvas の幅(右側に少し空白部を残す)
+                    var yAxisCvsWidth = copyWidth + 4;
+                    // 実際の描画幅(styleに設定する)
+                    var yAxisStyleWidth = yAxisCvsWidth / scale;
+
+                    // Y軸部分としてグラフからコピーすべき高さ (TODO: 良く分かっていない) ⇒これを実際の描画高とする(styleに設定)
+                    var yAxisStyleHeight = yAxScale.height + yAxScale.top + 10;
+                    // canvas におけるコピー高
+                    var copyHeight = yAxisStyleHeight * scale;
+                    // Y軸canvas の高さ
+                    var yAxisCvsHeight = copyHeight;
+
+                    // Y軸canvas の幅と高さを設定
+                    cvsYAxis.width = yAxisCvsWidth;
+                    cvsYAxis.height = yAxisCvsHeight;
+
+                    // Y軸canvas.style(実際に描画される大きさ)の幅と高さを設定
+                    cvsYAxis.style.width = yAxisStyleWidth + "px";
+                    cvsYAxis.style.height = yAxisStyleHeight + "px";
+
+                    // グラフcanvasからY軸部分のイメージをコピーする
+                    ctxYAxis.drawImage(cvsChart, 0, 0, copyWidth, copyHeight, 0, 0, copyWidth, copyHeight);
+
+                    // 軸ラベルのフォント色を透明に変更して、以降、再表示されても見えないようにする
+                    chart.options.scales.yAxes[0].ticks.fontColor = 'rgba(0,0,0,0)';
+                    chart.update();
+                    // 最初に描画されたグラフのY軸ラベル部分をクリアする
+                    ctxChart.clearRect(0, 0, yAxisStyleWidth, yAxisStyleHeight);
+                }
+
+                // グラフ描画
+                var myChart = new Chart(ctxChart, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '# of Votes',
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: colors,
+                        }]
+                    },
+                    options: {
+                        responsive: false,  // true（デフォルト）にすると画面の幅に合わせてしまう
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    },
+                    plugins: [{
+                        // 描画完了後に copyYAxisImage() を呼び出す
+                        // see https://www.chartjs.org/docs/latest/developers/plugins.html
+                        //     https://stackoverflow.com/questions/55416218/what-is-the-order-in-which-the-hooks-plugins-of-chart-js-are-executed
+                        afterRender: copyYAxisImage
+                    }]
+                });
+
+            }
+        </script>
+
+        <!-- html -->
+
+        <!-- スクロール可能グラフ領域のラッパーブロック -->
+        <!-- Y軸イメージコピー用 canvas -->
+        <canvas id="yAxis2" width="0"></canvas>
+
+        <div class="scrollableChartWrapper" style="width:400px">
+            <!-- スクロールされるcanvasを持つdiv -->
+            <div>
+                <!-- グラフ描画用キャンバス -->
+                <canvas id="chart2" style="height:250px"></canvas>
+            </div>
+        </div>
+
+        <!-- javascript -->
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.js"></script>
+        <script>
+            {
+                // Y軸コピー用canvasの取得
+                var cvsYAxis = document.getElementById("yAxis2");
+                var ctxYAxis = cvsYAxis.getContext('2d');
+                // テスト用
+                var data = [];
+                var labels = [];
+                var colors = [];
+
+                for (i = 0; i < 15; i++) {
+                    [12, 19, 3, 5, 2, 3].forEach(x => { data.push(x); });
+                    ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'].forEach(x => { labels.push(x); });
+                    ['rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                        'rgb(255, 206, 86)',
+                        'rgb(75, 192, 192)',
+                        'rgb(153, 102, 255)',
+                        'rgb(255, 159, 64)'].forEach(x => { colors.push(x); });
+                }
+
+                // x軸の1データあたりの幅
+                var xAxisStepSize = 50;
+                // グラフ全体の幅を計算
+                var chartWidth = data.length * xAxisStepSize;
+                // グラフ描画用 canvas
+                var cvsChart = document.getElementById('chart2');
+                var ctxChart = cvsChart.getContext('2d');
+                // グラフ描画用のcanvasのstyle.width（全データを描画するのに必要なサイズ）に上記の幅を設定
+                cvsChart.style.width = chartWidth + "px";
+
+                var copyYAxisCalled = false;
+
+                function copyYAxisImage(chart) {
+                    if (copyYAxisCalled) return;
+                    copyYAxisCalled = true;
+                    // グラフ描画後は、canvas.width(height):canvas.style.width(height) 比は、下記 scale の値になっている
+                    var scale = window.devicePixelRatio;
+
+                    // Y軸のスケール情報
+                    var yAxScale = chart.scales['y-axis-0'];
+
+                    // Y軸部分としてグラフからコピーすべき幅 (TODO: 良く分かっていない)
+                    var yAxisStyleWidth0 = yAxScale.width - 10;
+                    // canvas におけるコピー幅(yAxisStyleWidth0を直接使うと微妙にずれるので、整数値に切り上げる)
+                    var copyWidth = Math.ceil(yAxisStyleWidth0 * scale);
+                    // Y軸canvas の幅(右側に少し空白部を残す)
+                    var yAxisCvsWidth = copyWidth + 4;
+                    // 実際の描画幅(styleに設定する)
+                    var yAxisStyleWidth = yAxisCvsWidth / scale;
+
+                    // Y軸部分としてグラフからコピーすべき高さ (TODO: 良く分かっていない) ⇒これを実際の描画高とする(styleに設定)
+                    var yAxisStyleHeight = yAxScale.height + yAxScale.top + 10;
+                    // canvas におけるコピー高
+                    var copyHeight = yAxisStyleHeight * scale;
+                    // Y軸canvas の高さ
+                    var yAxisCvsHeight = copyHeight;
+
+                    // Y軸canvas の幅と高さを設定
+                    cvsYAxis.width = yAxisCvsWidth;
+                    cvsYAxis.height = yAxisCvsHeight;
+
+                    // Y軸canvas.style(実際に描画される大きさ)の幅と高さを設定
+                    cvsYAxis.style.width = yAxisStyleWidth + "px";
+                    cvsYAxis.style.height = yAxisStyleHeight + "px";
+
+                    // グラフcanvasからY軸部分のイメージをコピーする
+                    ctxYAxis.drawImage(cvsChart, 0, 0, copyWidth, copyHeight, 0, 0, copyWidth, copyHeight);
+
+                    // 軸ラベルのフォント色を透明に変更して、以降、再表示されても見えないようにする
+                    chart.options.scales.yAxes[0].ticks.fontColor = 'rgba(0,0,0,0)';
+                    chart.update();
+                    // 最初に描画されたグラフのY軸ラベル部分をクリアする
+                    ctxChart.clearRect(0, 0, yAxisStyleWidth, yAxisStyleHeight);
+                }
+
+                // グラフ描画
+                var myChart = new Chart(ctxChart, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '# of Votes',
+                            data: data,
+                            backgroundColor: colors,
+                            borderColor: colors,
+                        }]
+                    },
+                    options: {
+                        responsive: false,  // true（デフォルト）にすると画面の幅に合わせてしまう
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    },
+                    plugins: [{
+                        // 描画完了後に copyYAxisImage() を呼び出す
+                        // see https://www.chartjs.org/docs/latest/developers/plugins.html
+                        //     https://stackoverflow.com/questions/55416218/what-is-the-order-in-which-the-hooks-plugins-of-chart-js-are-executed
+                        afterRender: copyYAxisImage
+                    }]
+                });
+
+            }
+        </script>
+    </div>
+    <div class="item">
+
+    </div>
+    <div class="item">item 4</div>
+    <div class="item">item 5</div>
+    <div class="item">item 6</div>
+    <div class="item">item 1</div>
+    <div class="item">item 2</div>
+    <div class="item">item 3</div>
+    <div class="item">item 4</div>
+    <div class="item">item 5</div>
+    <div class="item">item 6</div>
+    <div class="item">item 1</div>
+    <div class="item">item 2</div>
+    <div class="item">item 3</div>
+    <div class="item">item 4</div>
+    <div class="item">item 5</div>
+    <div class="item">item 6</div>
+</div>

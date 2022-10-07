@@ -1,25 +1,64 @@
 .container {
-    width: 1000px;
+    width: 900px;
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-@media(max-width:1000px) {
+
+@media(max-width:900px) {
     .container {
         width: 100%;
     }
 }
 
+
 .item {
-    background: #0bd;
-    color: #fff;
+    background: ghostwhite;
+    color: #000;
+    border: 2px solid;
+    border-color: #adadad;
     margin: 10px;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 8px;
+    display: flex;
 }
 
 h1 {
     text-align: center;
+}
+
+h3 {
+    margin: 1px 20px;
+}
+
+.flex {
+    display: flex;
+    justify-content: center;
+}
+
+.center {
+    margin: 0 auto;
+}
+
+.scrollableChartWrapper {
+    position: relative;
+    background-color: ghostwhite;
+}
+
+/* スクロール可能グラフを囲む div */
+.scrollableChartWrapper>div {
+    position: relative;
+    overflow-x: scroll;
+}
+
+/* Y軸イメージコピー用 canvas */
+.scrollableChartWrapper>canvas {
+    position: absolute;
+    /* これにより、上の div と重なる位置に canvas が配置される */
+    left: 0;
+    top: 0;
+    background-color: ghostwhite;
+    /* ここをコメントアウトすると、背景色が透明になるので、Y軸を透かしてグラフ部分が見えるようになる */
 }
